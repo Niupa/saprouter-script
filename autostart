@@ -1,0 +1,56 @@
+##https://answers.sap.com/questions/7619089/saprouter-autostart-on-startup.html
+##Author Nelis Lamprecht
+#Example
+#sidadm@hostname:~> cat /etc/init.d/saprouter
+
+#! /bin/sh
+#
+. /etc/rc.status
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin; export PATH
+LOGFILE="/usr/sap/saprouter/saprouter.log"
+EXEDIR="/sapmnt/<SID>/exe"
+SRDIR="/usr/sap/saprouter"
+
+# Reset status of this service
+rc_reset
+
+case "$1" in
+    start)
+	echo -n "Starting saprouter"
+
+        if [ -f $EXEDIR/saprouter ] ; then
+
+          $EXEDIR/saprouter -G $LOGFILE -r -W 30000 -R $SRDIR/saprouttab >> $LOGFILE &
+
+        fi
+
+	# Remember status and be verbose
+	rc_status -v
+	;;
+    stop)
+	echo -n "Stopping saprouter"
+
+          $EXEDIR/saprouter -s
+
+	# Remember status and be verbose
+	rc_status -v
+	;;
+   check)
+          $EXEDIR/saprouter -l
+        ;;
+ restart)
+	 ## Stop the service and regardless of whether it was
+	 ## running or not, start it again.
+	   $0 stop
+	   $0 start
+
+	 # Remember status and be quiet
+	rc_status
+	;;
+    *)
+	echo "Usage: $0 {start|stop|check|restart}"
+	exit 1
+	;;
+esac
+rc_exit
