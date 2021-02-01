@@ -1,0 +1,25 @@
+
+#http://www.scalingbits.com/aws/sap/saprouter
+#Creation of a Service
+#SLES 12, 15 or Red Hat will need a service to restart the saprouter whenever needed. Create a file saprouter.service:
+
+[Unit]
+Description=SAP Router Configuration
+After=syslog.target network.target
+
+[Service]
+Type=simple
+RemainAfterExit=yes
+WorkingDirectory=/usr/sap/saprouter
+ExecStart=/usr/sap/saprouter/saprouter -r
+ExecStop=/usr/sap/saprouter/saprouter -s
+KillMode=none
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
+Start the service with the commands:
+
+#systemctl daemon-reload
+#systemctl enable saprouter.service
+#systemctl start saprouter.service
